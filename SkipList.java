@@ -1,6 +1,10 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.time.LocalDateTime;
+import java.time.format.*;
 import java.util.Random;
+import java.time.Period;
+import java.time.Duration;
 
 public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
@@ -343,7 +347,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         Node<K, V> node = findNode(key);
         if ( node != null ) {
             if( node.getNext() != null )
-                System.out.println("closest Key After " + key + " is " + node.getNext());
+                System.out.println("closest Key After " + key + " is " + node.getNext().getValue());
             else
                 System.out.println("closest Key After " + key + " does not exist!");
         }  else {
@@ -398,18 +402,105 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
     }
 
+    private static int getRandomNo(int low, int high) {
+        Random r = new Random();
+        return r.nextInt(high - low) + low;
+    }
+
     public static void main(String[] args) {
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/mm/dd HH:mm:ss.SSS");
+        
+        // First List
+        LocalDateTime now1 = LocalDateTime.now();
+        // System.out.println("Before implementing skip list 1: " + dtf.format(now1));
+
         SkipList<Integer, String> skipList = new SkipList<>();
-        for (int i = 1; i <= 100; i++) {
+        int randNo = getRandomNo(50, 10000);
+        for (int i = 1; i <= randNo; i++) {
             skipList.insertElement(i, String.valueOf(i));
         }    
         
 
         skipList.printList();
 
-        skipList.closestKeyAfter(120);
-        skipList.findElement(34);
-        skipList.removeElement(43);
+        skipList.closestKeyAfter(getRandomNo(50, randNo));
+        skipList.findElement(getRandomNo(50, randNo));
+        skipList.removeElement(getRandomNo(50, randNo));
+
+        LocalDateTime then1 = LocalDateTime.now();
+        // System.out.println("After implementing skip list 1: " + dtf.format(then1));
+        // Period timeTaken1 = Period.between(now1.toLocalDate(), then1.toLocalDate());
+        Duration timeDuration1 = Duration.between(now1, then1);
+        // LocalDateTime timeTaken1 = then1 - now1;
+        // System.out.println("Time Taken for implementing skip list 1: " + timeDuration1.toString());
+        String temp = timeDuration1.toString();
+        temp = temp.substring(2, temp.length());
+        double timeDurn1 = Double.parseDouble(temp.substring(0, temp.length() - 1));
+        // System.out.println("Total Time taken for implementing Skip List 1: " + timeDurn1 + " seconds.");
+
+        // Second List
+        LocalDateTime now2 = LocalDateTime.now();
+        // System.out.println("Before implementing skip list 2: " + dtf.format(now1));
+
+        SkipList<Integer, String> skipList1 = new SkipList<>();
+        randNo = getRandomNo(50, 10000);
+        for (int i = 1; i <= randNo; i++) {
+            skipList1.insertElement(i, String.valueOf(i));
+        }    
+        
+
+        skipList1.printList();
+
+        skipList1.closestKeyAfter(getRandomNo(50, randNo));
+        skipList1.findElement(getRandomNo(50, randNo));
+        skipList1.removeElement(getRandomNo(50, randNo));
+
+        LocalDateTime then2 = LocalDateTime.now();
+        // System.out.println("After implementing skip list 2: " + dtf.format(then2));
+        // Period timeTaken1 = Period.between(now1.toLocalDate(), then2.toLocalDate());
+        Duration timeDuration2 = Duration.between(now2, then2);
+        // LocalDateTime timeTaken1 = then1 - now1;
+        // System.out.println("Time Taken for implementing skip list 2: " + timeDuration2.toString());
+        String temp1 = timeDuration2.toString();
+        temp1 = temp1.substring(2, temp1.length());
+        double timeDurn2 = Double.parseDouble(temp1.substring(0, temp1.length() - 1));
+        // System.out.println("Total Time taken for implementing Skip List 2: " + timeDurn2 + " seconds.");
+
+        // Third List
+        LocalDateTime now3 = LocalDateTime.now();
+        // System.out.println("Before implementing skip list 3: " + dtf.format(now1));
+
+        SkipList<Integer, String> skipList2 = new SkipList<>();
+        randNo = getRandomNo(50, 10000);
+        for (int i = 1; i <= randNo; i++) {
+            skipList2.insertElement(i, String.valueOf(i));
+        }    
+        
+
+        skipList2.printList();
+
+        skipList2.closestKeyAfter(getRandomNo(50, randNo));
+        skipList2.findElement(getRandomNo(50, randNo));
+        skipList2.removeElement(getRandomNo(50, randNo));
+
+        LocalDateTime then3 = LocalDateTime.now();
+        // System.out.println("After implementing skip list 2: " + dtf.format(then3));
+        // Period timeTaken1 = Period.between(now1.toLocalDate(), then3.toLocalDate());
+        Duration timeDuration3 = Duration.between(now3, then3);
+        // LocalDateTime timeTaken1 = then1 - now1;
+        // System.out.println("Time Taken for implementing skip list 2: " + timeDuration3.toString());
+        String temp2 = timeDuration3.toString();
+        temp2 = temp2.substring(2, temp2.length());
+        double timeDurn3 = Double.parseDouble(temp2.substring(0, temp2.length() - 1));
+        // System.out.println("Total Time taken for implementing Skip List 3: " + timeDurn3 + " seconds.");
+
+        double avgTime = (timeDurn1 + timeDurn2 + timeDurn3) / 3;
+        
+        System.out.println("Total Time taken for implementing Skip List 1: " + timeDurn1 + " seconds.");
+        System.out.println("Total Time taken for implementing Skip List 2: " + timeDurn2 + " seconds.");
+        System.out.println("Total Time taken for implementing Skip List 3: " + timeDurn3 + " seconds.");
+        System.out.println("Average Time Taken for implementing 3 skip lists: " + avgTime + " seconds.");
     }
 
 }
