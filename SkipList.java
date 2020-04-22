@@ -3,7 +3,6 @@ import java.util.NoSuchElementException;
 import java.time.LocalDateTime;
 import java.time.format.*;
 import java.util.Random;
-import java.time.Period;
 import java.time.Duration;
 
 public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
@@ -17,6 +16,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     private double probability;
 
     private int size;
+    public static int count = 0;
 
     public SkipList() {
         this(DEFAULT_PROBABILITY);
@@ -43,6 +43,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         Node<K, V> node = findNode(key);
         if (node.getKey() != null && node.getKey().compareTo(key) == 0) {
             node.setValue(value);
+            System.out.println("Key already exist in the Skip List!");
             return;
         }
 
@@ -59,9 +60,14 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 head = newHead;
                 headLevel = head.getLevel();
             }
+
+            count++;
             // Move to the bottom
-            while (node.getDown() != null)
+            while (node.getDown() != null) {
+                count++;
                 node = node.getDown();
+            }
+                
             // Because node is on the lowest level so we need remove by down-top
             Node<K, V> prev = null;
             Node<K, V> next = null;
@@ -73,17 +79,21 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
             currentLevel++;
         }
         size++;
+        System.out.println("Inserted successfully!");
     }
 
     public void removeElement(K key) {
         checkKeyValidity(key);
         Node<K, V> node = findNode(key);
         if (node == null || node.getKey().compareTo(key) != 0)
-            throw new NoSuchElementException("The key does not exist!");
+            System.out.println("The key does not exist!");
 
         // Move to the bottom
-        while (node.getDown() != null)
+        while (node.getDown() != null) {
+            count++;
             node = node.getDown();
+        }
+            
         // Because node is on the lowest level so we need remove by down-top
         Node<K, V> prev = null;
         Node<K, V> next = null;
@@ -94,6 +104,8 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 prev.setNext(next);
             if (next != null)
                 next.setPrevious(prev);
+
+            count++;
         }
 
         // Adjust head
@@ -135,11 +147,12 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
             // Searching nearest (less than or equal) node with special key
             next = node.getNext();
             // System.out.println("next check: " + next.getValue());
-            
+            count++; // For caclulating no of steps
             while (next != null && lessThanOrEqual(next.getKey(), key)) {
                 node = next;
                 // System.out.println("next: " + node.getValue());
                 next = node.getNext();
+                count++;
             }
             nodeKey = node.getKey();
             if (nodeKey != null && nodeKey.compareTo(key) == 0)
@@ -369,14 +382,16 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
         while ( true ) {
             next = node.getNext();
-
+            count++;
             while (next != null) {
                 node = next;
                 System.out.print(node.getValue() + ": ");
                 upNode = node.getUp();
+                count++;
                 while ( upNode != null ) {
                     System.out.print(" " + upNode.getValue());
                     upNode = upNode.getUp();
+                    count++;
                 }
                 // if ( node.getUp() != null )
                 //     System.out.println("up: " + node.getUp().getValue());
@@ -402,105 +417,112 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
     }
 
-    private static int getRandomNo(int low, int high) {
-        Random r = new Random();
-        return r.nextInt(high - low) + low;
-    }
+    
 
-    public static void main(String[] args) {
+    // public static void main(String[] args) {
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/mm/dd HH:mm:ss.SSS");
+    //     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/mm/dd HH:mm:ss.SSS");
         
-        // First List
-        LocalDateTime now1 = LocalDateTime.now();
-        // System.out.println("Before implementing skip list 1: " + dtf.format(now1));
+    //     // First List
+    //     LocalDateTime now1 = LocalDateTime.now();
+    //     // System.out.println("Before implementing skip list 1: " + dtf.format(now1));
 
-        SkipList<Integer, String> skipList = new SkipList<>();
-        int randNo = getRandomNo(50, 10000);
-        for (int i = 1; i <= randNo; i++) {
-            skipList.insertElement(i, String.valueOf(i));
-        }    
+    //     SkipList<Integer, String> skipList = new SkipList<>();
+    //     int randNo = getRandomNo(50, 10000);
+    //     for (int i = 1; i <= randNo; i++) {
+    //         skipList.insertElement(i, String.valueOf(i));
+    //     }    
         
 
-        skipList.printList();
+    //     skipList.printList();
 
-        skipList.closestKeyAfter(getRandomNo(50, randNo));
-        skipList.findElement(getRandomNo(50, randNo));
-        skipList.removeElement(getRandomNo(50, randNo));
+    //     skipList.closestKeyAfter(getRandomNo(50, randNo));
+    //     skipList.findElement(getRandomNo(50, randNo));
+    //     skipList.removeElement(getRandomNo(50, randNo));
 
-        LocalDateTime then1 = LocalDateTime.now();
-        // System.out.println("After implementing skip list 1: " + dtf.format(then1));
-        // Period timeTaken1 = Period.between(now1.toLocalDate(), then1.toLocalDate());
-        Duration timeDuration1 = Duration.between(now1, then1);
-        // LocalDateTime timeTaken1 = then1 - now1;
-        // System.out.println("Time Taken for implementing skip list 1: " + timeDuration1.toString());
-        String temp = timeDuration1.toString();
-        temp = temp.substring(2, temp.length());
-        double timeDurn1 = Double.parseDouble(temp.substring(0, temp.length() - 1));
-        // System.out.println("Total Time taken for implementing Skip List 1: " + timeDurn1 + " seconds.");
+    //     LocalDateTime then1 = LocalDateTime.now();
+    //     // System.out.println("After implementing skip list 1: " + dtf.format(then1));
+    //     // Period timeTaken1 = Period.between(now1.toLocalDate(), then1.toLocalDate());
+    //     Duration timeDuration1 = Duration.between(now1, then1);
+    //     // LocalDateTime timeTaken1 = then1 - now1;
+    //     // System.out.println("Time Taken for implementing skip list 1: " + timeDuration1.toString());
+    //     String temp = timeDuration1.toString();
+    //     temp = temp.substring(2, temp.length());
+    //     double timeDurn1 = Double.parseDouble(temp.substring(0, temp.length() - 1));
+    //     // System.out.println("Total Time taken for implementing Skip List 1: " + timeDurn1 + " seconds.");
+    //     int count1 = count;
+    //     System.out.println("Count1: " + count1);
+    //     count = 0;
 
-        // Second List
-        LocalDateTime now2 = LocalDateTime.now();
-        // System.out.println("Before implementing skip list 2: " + dtf.format(now1));
+    //     // Second List
+    //     LocalDateTime now2 = LocalDateTime.now();
+    //     // System.out.println("Before implementing skip list 2: " + dtf.format(now1));
 
-        SkipList<Integer, String> skipList1 = new SkipList<>();
-        randNo = getRandomNo(50, 10000);
-        for (int i = 1; i <= randNo; i++) {
-            skipList1.insertElement(i, String.valueOf(i));
-        }    
+    //     SkipList<Integer, String> skipList1 = new SkipList<>();
+    //     randNo = getRandomNo(50, 10000);
+    //     for (int i = 1; i <= randNo; i++) {
+    //         skipList1.insertElement(i, String.valueOf(i));
+    //     }    
         
 
-        skipList1.printList();
+    //     skipList1.printList();
 
-        skipList1.closestKeyAfter(getRandomNo(50, randNo));
-        skipList1.findElement(getRandomNo(50, randNo));
-        skipList1.removeElement(getRandomNo(50, randNo));
+    //     skipList1.closestKeyAfter(getRandomNo(50, randNo));
+    //     skipList1.findElement(getRandomNo(50, randNo));
+    //     skipList1.removeElement(getRandomNo(50, randNo));
 
-        LocalDateTime then2 = LocalDateTime.now();
-        // System.out.println("After implementing skip list 2: " + dtf.format(then2));
-        // Period timeTaken1 = Period.between(now1.toLocalDate(), then2.toLocalDate());
-        Duration timeDuration2 = Duration.between(now2, then2);
-        // LocalDateTime timeTaken1 = then1 - now1;
-        // System.out.println("Time Taken for implementing skip list 2: " + timeDuration2.toString());
-        String temp1 = timeDuration2.toString();
-        temp1 = temp1.substring(2, temp1.length());
-        double timeDurn2 = Double.parseDouble(temp1.substring(0, temp1.length() - 1));
-        // System.out.println("Total Time taken for implementing Skip List 2: " + timeDurn2 + " seconds.");
+    //     LocalDateTime then2 = LocalDateTime.now();
+    //     // System.out.println("After implementing skip list 2: " + dtf.format(then2));
+    //     // Period timeTaken1 = Period.between(now1.toLocalDate(), then2.toLocalDate());
+    //     Duration timeDuration2 = Duration.between(now2, then2);
+    //     // LocalDateTime timeTaken1 = then1 - now1;
+    //     // System.out.println("Time Taken for implementing skip list 2: " + timeDuration2.toString());
+    //     String temp1 = timeDuration2.toString();
+    //     temp1 = temp1.substring(2, temp1.length());
+    //     double timeDurn2 = Double.parseDouble(temp1.substring(0, temp1.length() - 1));
+    //     // System.out.println("Total Time taken for implementing Skip List 2: " + timeDurn2 + " seconds.");
+    //     int count2 = count;
+    //     System.out.println("Count2: " + count2);
+    //     count = 0;
 
-        // Third List
-        LocalDateTime now3 = LocalDateTime.now();
-        // System.out.println("Before implementing skip list 3: " + dtf.format(now1));
+    //     // Third List
+    //     LocalDateTime now3 = LocalDateTime.now();
+    //     // System.out.println("Before implementing skip list 3: " + dtf.format(now1));
 
-        SkipList<Integer, String> skipList2 = new SkipList<>();
-        randNo = getRandomNo(50, 10000);
-        for (int i = 1; i <= randNo; i++) {
-            skipList2.insertElement(i, String.valueOf(i));
-        }    
+    //     SkipList<Integer, String> skipList2 = new SkipList<>();
+    //     randNo = getRandomNo(50, 10000);
+    //     for (int i = 1; i <= randNo; i++) {
+    //         skipList2.insertElement(i, String.valueOf(i));
+    //     }    
         
 
-        skipList2.printList();
+    //     skipList2.printList();
 
-        skipList2.closestKeyAfter(getRandomNo(50, randNo));
-        skipList2.findElement(getRandomNo(50, randNo));
-        skipList2.removeElement(getRandomNo(50, randNo));
+    //     skipList2.closestKeyAfter(getRandomNo(50, randNo));
+    //     skipList2.findElement(getRandomNo(50, randNo));
+    //     skipList2.removeElement(getRandomNo(50, randNo));
 
-        LocalDateTime then3 = LocalDateTime.now();
-        // System.out.println("After implementing skip list 2: " + dtf.format(then3));
-        // Period timeTaken1 = Period.between(now1.toLocalDate(), then3.toLocalDate());
-        Duration timeDuration3 = Duration.between(now3, then3);
-        // LocalDateTime timeTaken1 = then1 - now1;
-        // System.out.println("Time Taken for implementing skip list 2: " + timeDuration3.toString());
-        String temp2 = timeDuration3.toString();
-        temp2 = temp2.substring(2, temp2.length());
-        double timeDurn3 = Double.parseDouble(temp2.substring(0, temp2.length() - 1));
-        // System.out.println("Total Time taken for implementing Skip List 3: " + timeDurn3 + " seconds.");
+    //     LocalDateTime then3 = LocalDateTime.now();
+    //     // System.out.println("After implementing skip list 2: " + dtf.format(then3));
+    //     // Period timeTaken1 = Period.between(now1.toLocalDate(), then3.toLocalDate());
+    //     Duration timeDuration3 = Duration.between(now3, then3);
+    //     // LocalDateTime timeTaken1 = then1 - now1;
+    //     // System.out.println("Time Taken for implementing skip list 2: " + timeDuration3.toString());
+    //     String temp2 = timeDuration3.toString();
+    //     temp2 = temp2.substring(2, temp2.length());
+    //     double timeDurn3 = Double.parseDouble(temp2.substring(0, temp2.length() - 1));
+    //     // System.out.println("Total Time taken for implementing Skip List 3: " + timeDurn3 + " seconds.");
+    //     int count3 = count;
+    //     System.out.println("Count3: " + count3);
 
-        double avgTime = (timeDurn1 + timeDurn2 + timeDurn3) / 3;
+    //     double avgTime = (timeDurn1 + timeDurn2 + timeDurn3) / 3;
+    //     double avgCount = (count1 + count2 + count3) / 3;
         
-        System.out.println("Total Time taken for implementing Skip List 1: " + timeDurn1 + " seconds.");
-        System.out.println("Total Time taken for implementing Skip List 2: " + timeDurn2 + " seconds.");
-        System.out.println("Total Time taken for implementing Skip List 3: " + timeDurn3 + " seconds.");
-        System.out.println("Average Time Taken for implementing 3 skip lists: " + avgTime + " seconds.");
-    }
+    //     System.out.println("Total Time taken for implementing Skip List 1: " + timeDurn1 + " seconds.");
+    //     System.out.println("Total Time taken for implementing Skip List 2: " + timeDurn2 + " seconds.");
+    //     System.out.println("Total Time taken for implementing Skip List 3: " + timeDurn3 + " seconds.");
+    //     System.out.println("Average Time Taken for implementing 3 skip lists: " + avgTime + " seconds.");
+    //     System.out.println("Average number of steps executed: " + avgCount);
+    // }
 
 }
