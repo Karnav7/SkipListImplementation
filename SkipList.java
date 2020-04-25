@@ -82,61 +82,61 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         this.size = 0;
     }
 
-    public V get(K key) {
-        checkKeyValidity(key);
-        Node<K, V> node = findNode(key);
-        // System.out.println("up " + node.level);
-        if (node.getKey().compareTo(key) == 0)
-            return node.getValue();
-        else
-            return null;
-    }
+    // public V get(K key) {
+    //     checkKeyValidity(key);
+    //     Node<K, V> node = findNode(key);
+    //     // System.out.println("up " + node.level);
+    //     if (node.getKey().compareTo(key) == 0)
+    //         return node.getValue();
+    //     else
+    //         return null;
+    // }
+
+    // public void insertElement(K key, V value) {
+    //     checkKeyValidity(key);
+    //     Node<K, V> node = findNode(key);
+    //     if (node.getKey() != null && node.getKey().compareTo(key) == 0) {
+    //         node.setValue(value);
+    //         System.out.println("Key already exist in the Skip List!");
+    //         return;
+    //     }
+
+    //     Node<K, V> newNode = new Node<K, V>(key, value, node.getLevel());
+    //     horizontalInsert(node, newNode);
+    //     // Decide level according to the probability function
+    //     int currentLevel = node.getLevel();
+    //     int headLevel = head.getLevel();
+    //     while (isBuildLevel()) {
+    //         // buiding a new level
+    //         if (currentLevel >= headLevel) {
+    //             Node<K, V> newHead = new Node<K, V>(null, null, headLevel + 1);
+    //             verticalLink(newHead, head);
+    //             head = newHead;
+    //             headLevel = head.getLevel();
+    //         }
+
+    //         count++;
+    //         // Move to the bottom
+    //         while (node.getDown() != null) {
+    //             count++;
+    //             node = node.getDown();
+    //         }
+                
+    //         // Because node is on the lowest level so we need remove by down-top
+    //         Node<K, V> prev = null;
+    //         Node<K, V> next = null;
+
+    //         Node<K, V> tmp = new Node<K, V>(key, value, node.getLevel());
+    //         horizontalInsert(node, tmp);
+    //         verticalLink(tmp, newNode);
+    //         newNode = tmp;
+    //         currentLevel++;
+    //     }
+    //     size++;
+    //     System.out.println("Inserted successfully!");
+    // }
 
     public void insertElement(K key, V value) {
-        checkKeyValidity(key);
-        Node<K, V> node = findNode(key);
-        if (node.getKey() != null && node.getKey().compareTo(key) == 0) {
-            node.setValue(value);
-            System.out.println("Key already exist in the Skip List!");
-            return;
-        }
-
-        Node<K, V> newNode = new Node<K, V>(key, value, node.getLevel());
-        horizontalInsert(node, newNode);
-        // Decide level according to the probability function
-        int currentLevel = node.getLevel();
-        int headLevel = head.getLevel();
-        while (isBuildLevel()) {
-            // buiding a new level
-            if (currentLevel >= headLevel) {
-                Node<K, V> newHead = new Node<K, V>(null, null, headLevel + 1);
-                verticalLink(newHead, head);
-                head = newHead;
-                headLevel = head.getLevel();
-            }
-
-            count++;
-            // Move to the bottom
-            while (node.getDown() != null) {
-                count++;
-                node = node.getDown();
-            }
-                
-            // Because node is on the lowest level so we need remove by down-top
-            Node<K, V> prev = null;
-            Node<K, V> next = null;
-
-            Node<K, V> tmp = new Node<K, V>(key, value, node.getLevel());
-            horizontalInsert(node, tmp);
-            verticalLink(tmp, newNode);
-            newNode = tmp;
-            currentLevel++;
-        }
-        size++;
-        System.out.println("Inserted successfully!");
-    }
-
-    public void newInsertElement(K key, V value) {
         if ( size != 0 ) {
             checkKeyValidity(key);
             Node<K, V> node = newFindNode(key);
@@ -256,13 +256,15 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
     public void removeElement(K key) {
         checkKeyValidity(key);
-        Node<K, V> node = findNode(key);
-        if (node == null || node.getKey().compareTo(key) != 0)
+        Node<K, V> node = newFindNode(key);
+        if (node == null || node.getKey().compareTo(key) != 0) {
             System.out.println("The key does not exist!");
+            return;
+        }
+            
 
         // Move to the bottom
         while (node.getDown() != null) {
-            count++;
             node = node.getDown();
         }
             
@@ -276,28 +278,26 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 prev.setNext(next);
             if (next != null)
                 next.setPrevious(prev);
-
-            count++;
         }
 
         // Adjust head
-        while (head.getNext() == null && head.getDown() != null) {
-            head = head.getDown();
-            head.setUp(null);
-        }
+        // while (head.getNext() == null && head.getDown() != null) {
+        //     head = head.getDown();
+        //     head.setUp(null);
+        // }
         size--;
         System.out.println("Element " + key + " was removed successfully!");
     }
 
-    public boolean findElement(K key) {
-        // System.out.println("YO: " + get(key));
-        if ( get(key) != null ) {
-            System.out.println("Element " + key + " was found!");
-        } else {
-            System.out.println("Element " + key + " was not found!");
-        } 
-        return get(key) != null;
-    }
+    // public boolean findElement(K key) {
+    //     // System.out.println("YO: " + get(key));
+    //     if ( get(key) != null ) {
+    //         System.out.println("Element " + key + " was found!");
+    //     } else {
+    //         System.out.println("Element " + key + " was not found!");
+    //     } 
+    //     return get(key) != null;
+    // }
 
     public int size() {
         return size;
@@ -313,7 +313,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         if ( getMaxLevel() > 0 ) {
             for ( int i = 0; i < getMaxLevel(); i++ ) {
                 currNode = currNode.getUp();
-                System.out.println("curNode: " + currNode);
+                // System.out.println("curNode: " + currNode);
             }
         }
 
@@ -326,17 +326,17 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 next = currNode.getNext();
                 while (next != null && lessThanOrEqual(next.getKey(), key)) {
                     currNode = next;
-                    System.out.println("next: " + currNode.getValue());
+                    // System.out.println("next: " + currNode.getValue());
                     next = currNode.getNext();
                 }
             }
 
             if ( currNode != null ) {
                 nodeKey = currNode.getKey();
-                System.out.println("key: " + nodeKey);
+                // System.out.println("key: " + nodeKey);
                 if ((nodeKey != null || nodeKey != this.head.getKey()) && nodeKey.compareTo(key) == 0) {
                     this.previousSearchNode = currNode;
-                    System.out.println("yo: " + this.previousSearchNode);
+                    // System.out.println("yo: " + this.previousSearchNode);
                     break;
                 }
             }
@@ -344,7 +344,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
             // Descend to the bottom for continue search
             down = currNode.getDown();
-            System.out.println("down: " + down);
+            // System.out.println("down: " + down);
 
             if (down != null) {
                 currNode = down;
@@ -352,18 +352,18 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 // System.out.println("yo1: " + this.previousSearchNode);
             } else {
                 this.previousSearchNode = currNode;
-                System.out.println("yo: " + this.previousSearchNode);
+                // System.out.println("yo: " + this.previousSearchNode);
                 break;
             }
         }
 
         // if ( currNode.getKey().compareTo(key) == 0 ) {
-        System.out.println("CurrNode: " + currNode);
+        // System.out.println("CurrNode: " + currNode);
         // }
         return currNode;
     }
 
-    public boolean newFindElement(K key) {
+    public boolean findElement(K key) {
         Node<K, V> node = newFindNode(key);
         if ( node.getKey() != null && node.getKey().compareTo(key) == 0 ) {
             System.out.println("Key " + key + " found");
@@ -374,49 +374,49 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         return false;
     }
 
-    protected Node<K, V> findNode(K key) {
-        Node<K, V> node = head;
-        Node<K, V> next = null;
-        Node<K, V> down = null;
-        K nodeKey = null;
+    // protected Node<K, V> findNode(K key) {
+    //     Node<K, V> node = head;
+    //     Node<K, V> next = null;
+    //     Node<K, V> down = null;
+    //     K nodeKey = null;
 
-        // System.out.println("head: " + node.getValue());
+    //     // System.out.println("head: " + node.getValue());
 
-        while (true) {
-            // Searching nearest (less than or equal) node with special key
-            next = node.getNext();
-            // System.out.println("next check: " + next.getValue());
-            count++; // For caclulating no of steps
-            while (next != null && lessThanOrEqual(next.getKey(), key)) {
-                node = next;
-                // System.out.println("next: " + node.getValue());
-                next = node.getNext();
-                count++;
-            }
-            nodeKey = node.getKey();
-            if (nodeKey != null && nodeKey.compareTo(key) == 0) {
-                this.previousSearchNode = node.getPrevious();
-                System.out.println("yo: " + this.previousSearchNode);
-                break;
-            }
+    //     while (true) {
+    //         // Searching nearest (less than or equal) node with special key
+    //         next = node.getNext();
+    //         // System.out.println("next check: " + next.getValue());
+    //         count++; // For caclulating no of steps
+    //         while (next != null && lessThanOrEqual(next.getKey(), key)) {
+    //             node = next;
+    //             // System.out.println("next: " + node.getValue());
+    //             next = node.getNext();
+    //             count++;
+    //         }
+    //         nodeKey = node.getKey();
+    //         if (nodeKey != null && nodeKey.compareTo(key) == 0) {
+    //             this.previousSearchNode = node.getPrevious();
+    //             System.out.println("yo: " + this.previousSearchNode);
+    //             break;
+    //         }
                 
-            // Descend to the bottom for continue search
-            down = node.getDown();
+    //         // Descend to the bottom for continue search
+    //         down = node.getDown();
             
-            // if(node.getDown() != null)
-            // System.out.println("down: " + node.getDown().value);
-            if (down != null) {
-                node = down;
-                this.previousSearchNode = node.getPrevious();
-                System.out.println("yo1: " + this.previousSearchNode);
-            } else {
+    //         // if(node.getDown() != null)
+    //         // System.out.println("down: " + node.getDown().value);
+    //         if (down != null) {
+    //             node = down;
+    //             this.previousSearchNode = node.getPrevious();
+    //             System.out.println("yo1: " + this.previousSearchNode);
+    //         } else {
                 
-                break;
-            }
-        }
+    //             break;
+    //         }
+    //     }
 
-        return node;
-    }
+    //     return node;
+    // }
 
     protected void checkKeyValidity(K key) {
         if (key == null)
@@ -429,17 +429,17 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         return a.compareTo(b) <= 0;
     }
 
-    protected boolean isBuildLevel() {
-        return randomGenerator.nextDouble() < probability;
-    }
+    // protected boolean isBuildLevel() {
+    //     return randomGenerator.nextDouble() < probability;
+    // }
 
-    protected void horizontalInsert(Node<K, V> x, Node<K, V> y) {
-        y.setPrevious(x);
-        y.setNext(x.getNext());
-        if (x.getNext() != null)
-            x.getNext().setPrevious(y);
-        x.setNext(y);
-    }
+    // protected void horizontalInsert(Node<K, V> x, Node<K, V> y) {
+    //     y.setPrevious(x);
+    //     y.setNext(x.getNext());
+    //     if (x.getNext() != null)
+    //         x.getNext().setPrevious(y);
+    //     x.setNext(y);
+    // }
 
     protected void verticalLink(Node<K, V> x, Node<K, V> y) {
         x.setDown(y);
@@ -611,85 +611,100 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
     public void closestKeyAfter(K key) {
         checkKeyValidity(key);
-        Node<K, V> node = findNode(key);
+        Node<K, V> node = newFindNode(key);
         if ( node != null ) {
             if( node.getNext() != null )
                 System.out.println("closest Key After " + key + " is " + node.getNext().getValue());
             else
                 System.out.println("closest Key After " + key + " does not exist!");
-        }  else {
-            System.out.println("Key " + key + " does not exist!");
-        }
+        }  
+        // else {
+        //     // System.out.println("Key " + key + " does not exist!");
+        //     System.out.println("prevSearchKey" + this.previousSearchNode);
+        //     Node<K, V> down = this.previousSearchNode;
+        //     while ( down.getDown() != null ) {
+        //         down = down.getDown();
+        //     }
+        //     System.out.println("prevSearchKeyNext" + down.getNext());
+        // }
             
     }
 
-    public void printList() {
+    // public void printList() {
+    //     Node<K, V> node = head;
+    //     Node<K, V> next = null;
+    //     Node<K, V> down = null;
+    //     // System.out.println("head: " + node.getValue());
+    //     // Node<K, V> nextNode = head;
+    //     Node<K, V> upNode = null;
+
+    //     // next = node.getNext();
+    //     System.out.println("Skip List");
+
+    //     while ( true ) {
+    //         next = node.getNext();
+    //         count++;
+    //         while (next != null) {
+    //             node = next;
+    //             System.out.print(node.getValue() + ": ");
+    //             upNode = node.getUp();
+    //             count++;
+    //             while ( upNode != null ) {
+    //                 System.out.print(" " + upNode.getValue());
+    //                 upNode = upNode.getUp();
+    //                 count++;
+    //             }
+    //             // if ( node.getUp() != null )
+    //             //     System.out.println("up: " + node.getUp().getValue());
+    //             next = node.getNext();
+    //             System.out.println("");
+    //         }
+
+    //         // if ( next == null ) {
+    //         //     break;
+    //         // }
+
+    //         // Descend to the bottom for continue search
+    //         down = node.getDown();
+    //         // if(node.getDown() != null)
+    //         // System.out.println("down: " + node.getDown().value);
+    //         if (down != null) {
+    //             node = down;
+    //             // System.out.println("down: " + down.value);
+    //         } else {
+    //             break;
+    //         }
+    //     }
+
+    // }
+
+    public void newNewPrint() {
         Node<K, V> node = head;
-        Node<K, V> next = null;
-        Node<K, V> down = null;
-        // System.out.println("head: " + node.getValue());
-        // Node<K, V> nextNode = head;
-        Node<K, V> upNode = null;
-
-        // next = node.getNext();
-        System.out.println("Skip List");
-
-        while ( true ) {
-            next = node.getNext();
-            count++;
-            while (next != null) {
-                node = next;
-                System.out.print(node.getValue() + ": ");
-                upNode = node.getUp();
-                count++;
-                while ( upNode != null ) {
-                    System.out.print(" " + upNode.getValue());
-                    upNode = upNode.getUp();
-                    count++;
-                }
-                // if ( node.getUp() != null )
-                //     System.out.println("up: " + node.getUp().getValue());
-                next = node.getNext();
-                System.out.println("");
-            }
-
-            // if ( next == null ) {
-            //     break;
-            // }
-
-            // Descend to the bottom for continue search
-            down = node.getDown();
-            // if(node.getDown() != null)
-            // System.out.println("down: " + node.getDown().value);
-            if (down != null) {
-                node = down;
-                // System.out.println("down: " + down.value);
-            } else {
-                break;
-            }
-        }
-
-    }
-
-    public void newPrint() {
-        Node<K, V> node = head;
-        System.out.println("temp: " + node.getNext());
-        int count = 0;
+        int maxLvl = getMaxLevel();
+        int i = 0;
         
-        // Move into the lower left bottom
-        while (node.getDown() != null)
-            node = node.getDown();
-
-        while (node.getPrevious() != null)
-            node = node.getPrevious();
-        
-        while ( node != null ) {
-            System.out.println("currnode: " + node.getValue());
-            node = node.getNext();
-            
-            count++;
+        while ( node.getUp() != null ) {
+            node = node.getUp();
         }
-        System.out.println("count: " + count);
+        
+        Node<K, V> down = node;
+        while ( down != null ) {
+            String s = "";
+            Node<K, V> next = down;
+            System.out.print("Level " + maxLvl + ": ");
+            while ( next.getNext() != null && next.getNext().getValue() != null ) {
+                next = next.getNext();
+                s += next.getValue().toString() + "-->";
+                // System.out.print(s.substring(0, s.length() - 3));
+                // s = "";
+            }
+            if ( s.length() >= 3 )
+                System.out.print(s.substring(0, s.length() - 3));
+            System.out.println();
+            down = down.getDown();
+            maxLvl -= 1;
+        }
+        
     }
 
     // public static void main(String[] args) {

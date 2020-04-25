@@ -32,39 +32,44 @@ public class PartOne {
         int check = 1;
 
         while (check == 1) {
-            System.out.println("Choose an operation to perform:\n1 - insert\n2 - remove\n3 - find\n4 - closestKeyAfter\n5 - print\n6 - exit");
+            System.out.println("Choose an operation to perform:\n1 - insert\n2 - remove\n3 - find\n4 - closestKeyAfter\n5 - exit");
             int choice = sc.nextInt();
             switch(choice) {
                 case 1:
                     System.out.println("Enter data to be inserted in Skip List: ");
                     int input = sc1.nextInt();
-                    // skipList.insertElement(input, String.valueOf(input));
-                    skipList.newInsertElement(input, String.valueOf(input));
+                    skipList.insertElement(input, String.valueOf(input));
+                    // skipList.newInsertElement(input, String.valueOf(input));
+                    skipList.newNewPrint();
                 break;
                 case 2:
                     System.out.println("Enter data to remove from Skip List: ");
                     input = sc1.nextInt();
                     skipList.removeElement(input);
+                    skipList.newNewPrint();
                 break;
                 case 3:
                     System.out.println("Enter data to be searched in the Skip List: ");
                     input = sc1.nextInt();
-                    // skipList.findElement(input);
-                    skipList.newFindElement(input);
-                    System.out.println("chk: " + skipList.previousSearchNode.getNext().getLevel());
+                    
+                    skipList.newNewPrint();
+                    skipList.findElement(input);
+                    // skipList.newFindElement(input);
                 break;
                 case 4:
                     System.out.println("Enter data to find next closest key after it: ");
                     input = sc1.nextInt();
+                    skipList.newNewPrint();
                     skipList.closestKeyAfter(input);
                 break;
+                // case 5:
+                //     System.out.println("Skip List: ");
+                //     skipList.printList();
+                //     skipList.newNewPrint();
+                //     // skipList.newPrint();
+                //     // System.out.println("chk: " + skipList.toString());
+                // break;
                 case 5:
-                    System.out.println("Skip List: ");
-                    skipList.printList();
-                    skipList.newPrint();
-                    // System.out.println("chk: " + skipList.toString());
-                break;
-                case 6:
                     check = 0;
                     System.out.println("Bye!");
                 break;
