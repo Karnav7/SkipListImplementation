@@ -14,37 +14,44 @@ public class PartOne {
         Scanner sc = new Scanner(System.in);
 
         SkipList<Integer, String> skipList = new SkipList<>();
-        int randNo = getRandomNo(50, 10000);
-        for (int i = 1; i <= randNo; i++) {
-            skipList.insertElement(i, String.valueOf(i));
-        }    
+        // int randNo = getRandomNo(50, 10000);
+        // for (int i = 1; i <= randNo; i++) {
+        //     skipList.insertElement(i, String.valueOf(i));
+        // }    
         
+        // for (int i = 1; i <= 10; i++) {
+        //     skipList.insertElement(i, String.valueOf(i));
+        // } 
 
-        skipList.printList();
+        // skipList.printList();
+
+        skipList.setInitialSkipList(0, null);
 
         Scanner sc1 = new Scanner(System.in);
 
         int check = 1;
 
         while (check == 1) {
-            System.out.println("Enter 1. to perform insert operation, 2. to perform findElement operation, 3. to perform removeElement operation," +
-                "4. to perform findClosestKeyAfter operation, 5. to print skip list, 6. to exit.");
+            System.out.println("Choose an operation to perform:\n1 - insert\n2 - remove\n3 - find\n4 - closestKeyAfter\n5 - print\n6 - exit");
             int choice = sc.nextInt();
             switch(choice) {
                 case 1:
                     System.out.println("Enter data to be inserted in Skip List: ");
                     int input = sc1.nextInt();
-                    skipList.insertElement(input, String.valueOf(input));
+                    // skipList.insertElement(input, String.valueOf(input));
+                    skipList.newInsertElement(input, String.valueOf(input));
                 break;
                 case 2:
-                    System.out.println("Enter data to be searched in the Skip List: ");
-                    input = sc1.nextInt();
-                    skipList.findElement(input);
-                break;
-                case 3:
                     System.out.println("Enter data to remove from Skip List: ");
                     input = sc1.nextInt();
                     skipList.removeElement(input);
+                break;
+                case 3:
+                    System.out.println("Enter data to be searched in the Skip List: ");
+                    input = sc1.nextInt();
+                    // skipList.findElement(input);
+                    skipList.newFindElement(input);
+                    System.out.println("chk: " + skipList.previousSearchNode.getNext().getLevel());
                 break;
                 case 4:
                     System.out.println("Enter data to find next closest key after it: ");
@@ -54,6 +61,8 @@ public class PartOne {
                 case 5:
                     System.out.println("Skip List: ");
                     skipList.printList();
+                    skipList.newPrint();
+                    // System.out.println("chk: " + skipList.toString());
                 break;
                 case 6:
                     check = 0;

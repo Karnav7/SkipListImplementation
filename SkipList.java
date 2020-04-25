@@ -13,14 +13,67 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     protected static final double DEFAULT_PROBABILITY = 0.5;
 
     private Node<K, V> head;
+    private Node<K, V> tail;
+    public Node<K, V> previousSearchNode;
 
     private double probability;
 
     private int size;
+    private int maxLevel = 0;
     public static int count = 0;
+
+    public void setInitialSkipList(K key, V value) {
+        // Node<K, V> node = null;
+        // node.setKey(0);
+        this.head = new Node<K, V>(key, value, 0);
+        this.tail = new Node<K, V>(null, null, 0);
+        this.size = 0;
+        // this.head.setNext(this.tail);
+        // this.tail.setPrevious(this.head);
+        // this.head.setUp(new Node<K, V>(null, null, 1));
+        // this.tail.setUp(new Node<K, V>(null, null, 1));
+        // Node<K, V> h1 = this.head.getUp();
+        // Node<K, V> t1 = this.tail.getUp();
+    }
+
+    private void increaseSkipListHeight() {
+        Node<K, V> newHead = new Node<K, V>(this.head.getKey(), null, getMaxLevel());
+        Node<K, V> newTail = new Node<K, V>(null, null, getMaxLevel());
+        Node<K, V> headTemp = this.head;
+        Node<K, V> tailTemp = this.tail;
+        for ( int i = 0; i < getMaxLevel() - 1; i++ ) {
+            headTemp = headTemp.getUp();
+            tailTemp = tailTemp.getUp();
+        }
+
+        headTemp.setUp(newHead);
+        tailTemp.setUp(newTail);
+        newHead.setDown(headTemp);
+        newTail.setDown(tailTemp);
+        newHead.setNext(newTail);
+        newTail.setPrevious(newHead);
+    }
+
+    private int getMaxLevel() {
+        return this.maxLevel;
+    }
+
+    private void setMaxLevel(int level) {
+        this.maxLevel = level;
+    }
 
     public SkipList() {
         this(DEFAULT_PROBABILITY);
+    }
+
+    private int getRandomNo(int low, int high) {
+        Random r = new Random();
+        return r.nextInt(high - low) + low;
+    }
+
+    private int flipCoin() {
+        Random r = new Random();
+        return r.nextInt(2);
     }
 
     public SkipList(double probability) {
@@ -83,6 +136,124 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         System.out.println("Inserted successfully!");
     }
 
+    public void newInsertElement(K key, V value) {
+        if ( size != 0 ) {
+            checkKeyValidity(key);
+            Node<K, V> node = newFindNode(key);
+            System.out.println("node: " + node);
+            if (node.getKey() != null && node.getKey().compareTo(key) == 0) {
+                node.setValue(value);
+                System.out.println("Key already exist in the Skip List!");
+                return;
+            }
+
+            System.out.println("prevSearchNode: " + this.previousSearchNode);
+            Node<K, V> prevNode = this.previousSearchNode;
+            Node<K, V> downPrevNode = prevNode;
+            if ( prevNode != null ) {
+                if ( prevNode.getDown() != null ) {
+                    downPrevNode = downPrevNode.getDown();
+                    while ( downPrevNode != null ) {
+                        downPrevNode = downPrevNode.getDown();
+                    }
+                }
+            }
+            
+            
+
+            Node<K, V> newNode = new Node<K, V>(key, value, 0);
+            Node<K, V> tempNew = newNode; int i = 0;
+            Node<K, V> tempPrev = downPrevNode;
+            Node<K, V> tempNext = downPrevNode.getNext();
+            while ( true ) {
+                System.out.println("flipCoin: " + flipCoin());
+                if (flipCoin() == 1) {          // heads
+                    Node<K, V> newUp = new Node<K, V>(key, value, i+1);
+                    tempNew.setUp(newUp);
+                    newUp.setDown(tempNew);
+
+                    if ( newUp.getLevel() > getMaxLevel() ) {
+                        setMaxLevel(newUp.getLevel());
+                        increaseSkipListHeight();
+                    }
+                } else {                        // tails
+                    break;
+                }
+                tempNew = tempNew.getUp();
+                i++;
+            }
+
+            tempNew = newNode;
+
+            // setting all previous nodes
+            tempNew.setPrevious(tempPrev);
+            tempPrev.setNext(tempNew);
+            // for ( int j = 0; j <= i; j++ ) {
+            while( tempNew != null ) {
+                if ( i == 0 )
+                    break;
+                tempNew = tempNew.getUp();
+                System.out.println("tempNew: " + tempNew);
+                if ( tempNew == null )
+                    break;
+                while ( true ) {
+                    if ( tempPrev.getUp() != null ) {
+                        tempPrev = tempPrev.getUp();
+                        tempNew.setPrevious(tempPrev);
+                        tempPrev.setNext(tempNew);
+                        break;
+                    } else {
+                        if ( tempPrev.getPrevious() != null ) {
+                            tempPrev = tempPrev.getPrevious();
+                        }
+                        // tempPrev = tempPrev.getPrevious();
+                    }
+                }
+                
+            }
+
+            tempNew = newNode;
+            // setting all next nodes
+            tempNew.setNext(tempNext);
+            tempNext.setPrevious(tempNew);
+            // for ( int j = 0; j <= i; j++ ) {
+            while( tempNew != null ) {
+                if (i == 0 )
+                    break;
+                tempNew = tempNew.getUp();
+                System.out.println("tempNew: " + tempNew);
+                if ( tempNew == null )
+                    break;
+                while( true ) {
+                    if ( tempNext.getUp() != null ) {
+                        tempNext = tempNext.getUp();
+                        tempNew.setNext(tempNext);
+                        tempNext.setPrevious(tempNew);
+                        break;
+                    } else {
+                        if ( tempNext.getNext() != null ) {
+                            tempNext = tempNext.getNext();
+                        }
+                        // tempNext = tempNext.getNext();
+                    }
+                }
+            }
+        } else {
+            Node<K, V> newNode = new Node<K, V>(key, value, 0);
+            Node<K, V> headNode = this.head;
+            Node<K, V> tailNode = this.tail;
+            newNode.setNext(tailNode);
+            headNode.setNext(newNode);
+            tailNode.setPrevious(newNode);
+            newNode.setPrevious(headNode);
+            
+        }
+        
+
+        size++;
+        System.out.println("Inserted successfully!");
+    }
+
     public void removeElement(K key) {
         checkKeyValidity(key);
         Node<K, V> node = findNode(key);
@@ -136,6 +307,73 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         return size == 0;
     }
 
+    private Node<K, V> newFindNode(K key) {
+        Node<K, V> currNode = this.head;
+
+        if ( getMaxLevel() > 0 ) {
+            for ( int i = 0; i < getMaxLevel(); i++ ) {
+                currNode = currNode.getUp();
+                System.out.println("curNode: " + currNode);
+            }
+        }
+
+        Node<K, V> next = null;
+        Node<K, V> down = null;
+        K nodeKey = null;
+
+        while ( true ) {
+            if ( currNode != null ) {
+                next = currNode.getNext();
+                while (next != null && lessThanOrEqual(next.getKey(), key)) {
+                    currNode = next;
+                    System.out.println("next: " + currNode.getValue());
+                    next = currNode.getNext();
+                }
+            }
+
+            if ( currNode != null ) {
+                nodeKey = currNode.getKey();
+                System.out.println("key: " + nodeKey);
+                if ((nodeKey != null || nodeKey != this.head.getKey()) && nodeKey.compareTo(key) == 0) {
+                    this.previousSearchNode = currNode;
+                    System.out.println("yo: " + this.previousSearchNode);
+                    break;
+                }
+            }
+            
+
+            // Descend to the bottom for continue search
+            down = currNode.getDown();
+            System.out.println("down: " + down);
+
+            if (down != null) {
+                currNode = down;
+                // this.previousSearchNode = currNode.getPrevious();
+                // System.out.println("yo1: " + this.previousSearchNode);
+            } else {
+                this.previousSearchNode = currNode;
+                System.out.println("yo: " + this.previousSearchNode);
+                break;
+            }
+        }
+
+        // if ( currNode.getKey().compareTo(key) == 0 ) {
+        System.out.println("CurrNode: " + currNode);
+        // }
+        return currNode;
+    }
+
+    public boolean newFindElement(K key) {
+        Node<K, V> node = newFindNode(key);
+        if ( node.getKey() != null && node.getKey().compareTo(key) == 0 ) {
+            System.out.println("Key " + key + " found");
+            return true;
+        } else {
+            System.out.println("Key " + key + " not found");
+        }
+        return false;
+    }
+
     protected Node<K, V> findNode(K key) {
         Node<K, V> node = head;
         Node<K, V> next = null;
@@ -156,16 +394,23 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 count++;
             }
             nodeKey = node.getKey();
-            if (nodeKey != null && nodeKey.compareTo(key) == 0)
+            if (nodeKey != null && nodeKey.compareTo(key) == 0) {
+                this.previousSearchNode = node.getPrevious();
+                System.out.println("yo: " + this.previousSearchNode);
                 break;
+            }
+                
             // Descend to the bottom for continue search
             down = node.getDown();
+            
             // if(node.getDown() != null)
             // System.out.println("down: " + node.getDown().value);
             if (down != null) {
                 node = down;
-                // System.out.println("down: " + down.value);
+                this.previousSearchNode = node.getPrevious();
+                System.out.println("yo1: " + this.previousSearchNode);
             } else {
+                
                 break;
             }
         }
@@ -179,6 +424,8 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     protected boolean lessThanOrEqual(K a, K b) {
+        if ( a == null ) 
+            return false;
         return a.compareTo(b) <= 0;
     }
 
@@ -279,6 +526,12 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
             this.value = value;
             this.level = level;
         }
+
+        // public Node(int key, V Value, int level) {
+        //     this.key = key;
+        //     this.value = value;
+        //     this.level = level;
+        // }
 
         @Override
         public String toString() {
@@ -418,7 +671,26 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
     }
 
-    
+    public void newPrint() {
+        Node<K, V> node = head;
+        System.out.println("temp: " + node.getNext());
+        int count = 0;
+        
+        // Move into the lower left bottom
+        while (node.getDown() != null)
+            node = node.getDown();
+
+        while (node.getPrevious() != null)
+            node = node.getPrevious();
+        
+        while ( node != null ) {
+            System.out.println("currnode: " + node.getValue());
+            node = node.getNext();
+            
+            count++;
+        }
+        System.out.println("count: " + count);
+    }
 
     // public static void main(String[] args) {
 
