@@ -1,5 +1,6 @@
 
 // package src.skiplist;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.*;
 import java.util.Random;
 import java.util.Set;
+import java.util.LinkedHashMap;
 
 import java.util.Map;
 import java.time.Duration;
@@ -28,16 +30,48 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     public static int count = 0;
 
     // Analysis Part
-    private Map<String, Long> insertMap = new HashMap<String, Long>();
+    private Map<Integer, Long> insertMap = new LinkedHashMap<Integer, Long>();
+    private Map<Integer, Long> findMap = new LinkedHashMap<Integer, Long>();
+    private Map<Integer, Long> findClosestMap = new LinkedHashMap<Integer, Long>();
+    private Map<Integer, Long> deleteMap = new LinkedHashMap<Integer, Long>();
 
-    private void addToInsertMap(String k1, Long k2) {
+    private void addToInsertMap(Integer k1, Long k2) {
         this.insertMap.put(k1, k2);
     }
 
-    public Set<Map.Entry<String, Long>> getInsertMap() {
-        Set<Map.Entry<String, Long>> st = this.insertMap.entrySet();
+    private void addToFindMap(Integer k1, Long k2) {
+        this.findMap.put(k1, k2);
+    }
+
+    private void addToFindClosestMap(Integer k1, Long k2) {
+        this.findClosestMap.put(k1, k2);
+    }
+
+    private void addToDeleteMap(Integer k1, Long k2) {
+        this.deleteMap.put(k1, k2);
+    }
+
+    public Set<Map.Entry<Integer, Long>> getInsertMap() {
+        Set<Map.Entry<Integer, Long>> st = this.insertMap.entrySet();
         return st;
     }
+
+    public Set<Map.Entry<Integer, Long>> getFindMap() {
+        Set<Map.Entry<Integer, Long>> st = this.findMap.entrySet();
+        return st;
+    }
+
+    public Set<Map.Entry<Integer, Long>> getFindClosestMap() {
+        Set<Map.Entry<Integer, Long>> st = this.findClosestMap.entrySet();
+        return st;
+    }
+
+    public Set<Map.Entry<Integer, Long>> getDeleteMap() {
+        Set<Map.Entry<Integer, Long>> st = this.deleteMap.entrySet();
+        return st;
+    }
+
+    // public Map<String, Long>
 
     private LocalDateTime getCurrentTime() {
         return LocalDateTime.now();
@@ -276,7 +310,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
             // Analysis Part
             LocalDateTime end = getCurrentTime();
-            addToInsertMap(newNode.getKey().toString(), calculateTimeDiff(start, end));
+            addToInsertMap(Integer.parseInt(newNode.getKey().toString()), calculateTimeDiff(start, end));
         } else {
             start = getCurrentTime();
             Node<K, V> newNode = new Node<K, V>(key, value, 0);
@@ -289,7 +323,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
             
             // Analysis Part
             LocalDateTime end = getCurrentTime();
-            addToInsertMap(newNode.getKey().toString(), calculateTimeDiff(start, end));
+            addToInsertMap(Integer.parseInt(newNode.getKey().toString()), calculateTimeDiff(start, end));
         }
         
 
@@ -300,6 +334,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     public void removeElement(K key) {
+        LocalDateTime start = getCurrentTime();
         checkKeyValidity(key);
         Node<K, V> node = newFindNode(key);
         if (node == null || node.getKey().compareTo(key) != 0) {
@@ -312,6 +347,11 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         while (node.getDown() != null) {
             node = node.getDown();
         }
+
+        // Analysis part
+        LocalDateTime end = getCurrentTime();
+        addToDeleteMap(Integer.parseInt(node.getKey().toString()), calculateTimeDiff(start, end));
+        // Analysis part ends here
             
         // Because node is on the lowest level so we need remove by down-top
         Node<K, V> prev = null;
@@ -332,6 +372,8 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         // }
         size--;
         System.out.println("Element " + key + " was removed successfully!");
+
+        
     }
 
     // public boolean findElement(K key) {
@@ -409,9 +451,14 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     public boolean findElement(K key) {
+        LocalDateTime start = getCurrentTime();
         Node<K, V> node = newFindNode(key);
         if ( node.getKey() != null && node.getKey().compareTo(key) == 0 ) {
             System.out.println("Key " + key + " found");
+
+            // Analysis part
+            LocalDateTime end = getCurrentTime();
+            addToFindMap(Integer.parseInt(node.getKey().toString()), calculateTimeDiff(start, end));
             return true;
         } else {
             System.out.println("Key " + key + " not found");
@@ -486,10 +533,10 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     //     x.setNext(y);
     // }
 
-    protected void verticalLink(Node<K, V> x, Node<K, V> y) {
-        x.setDown(y);
-        y.setUp(x);
-    }
+    // protected void verticalLink(Node<K, V> x, Node<K, V> y) {
+    //     x.setDown(y);
+    //     y.setUp(x);
+    // }
 
     @Override
     public String toString() {
@@ -655,12 +702,17 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     }
 
     public void closestKeyAfter(K key) {
+        LocalDateTime start = getCurrentTime();
         checkKeyValidity(key);
         Node<K, V> node = newFindNode(key);
         if ( node != null ) {
-            if( node.getNext() != null )
+            if( node.getNext() != null ) {
                 System.out.println("closest Key After " + key + " is " + node.getNext().getValue());
-            else
+
+                //Analysis Part
+                LocalDateTime end = getCurrentTime();
+                addToFindClosestMap(Integer.parseInt(node.getKey().toString()), calculateTimeDiff(start, end));
+            } else
                 System.out.println("closest Key After " + key + " does not exist!");
         }  
         // else {
