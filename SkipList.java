@@ -140,14 +140,14 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
         if ( size != 0 ) {
             checkKeyValidity(key);
             Node<K, V> node = newFindNode(key);
-            System.out.println("node: " + node);
+            // System.out.println("node: " + node);
             if (node.getKey() != null && node.getKey().compareTo(key) == 0) {
                 node.setValue(value);
                 System.out.println("Key already exist in the Skip List!");
                 return;
             }
 
-            System.out.println("prevSearchNode: " + this.previousSearchNode);
+            // System.out.println("prevSearchNode: " + this.previousSearchNode);
             Node<K, V> prevNode = this.previousSearchNode;
             Node<K, V> downPrevNode = prevNode;
             if ( prevNode != null ) {
@@ -166,7 +166,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
             Node<K, V> tempPrev = downPrevNode;
             Node<K, V> tempNext = downPrevNode.getNext();
             while ( true ) {
-                System.out.println("flipCoin: " + flipCoin());
+                // System.out.println("flipCoin: " + flipCoin());
                 if (flipCoin() == 1) {          // heads
                     Node<K, V> newUp = new Node<K, V>(key, value, i+1);
                     tempNew.setUp(newUp);
@@ -193,7 +193,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 if ( i == 0 )
                     break;
                 tempNew = tempNew.getUp();
-                System.out.println("tempNew: " + tempNew);
+                // System.out.println("tempNew: " + tempNew);
                 if ( tempNew == null )
                     break;
                 while ( true ) {
@@ -221,7 +221,7 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                 if (i == 0 )
                     break;
                 tempNew = tempNew.getUp();
-                System.out.println("tempNew: " + tempNew);
+                // System.out.println("tempNew: " + tempNew);
                 if ( tempNew == null )
                     break;
                 while( true ) {
