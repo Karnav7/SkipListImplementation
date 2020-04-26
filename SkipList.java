@@ -1,9 +1,14 @@
+
 // package src.skiplist;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.time.LocalDateTime;
 import java.time.format.*;
 import java.util.Random;
+import java.util.Set;
+
+import java.util.Map;
 import java.time.Duration;
 
 public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
@@ -21,6 +26,30 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     private int size;
     private int maxLevel = 0;
     public static int count = 0;
+
+    // Analysis Part
+    private Map<String, Long> insertMap = new HashMap<String, Long>();
+
+    private void addToInsertMap(String k1, Long k2) {
+        this.insertMap.put(k1, k2);
+    }
+
+    public Set<Map.Entry<String, Long>> getInsertMap() {
+        Set<Map.Entry<String, Long>> st = this.insertMap.entrySet();
+        return st;
+    }
+
+    private LocalDateTime getCurrentTime() {
+        return LocalDateTime.now();
+    }
+
+    private Long calculateTimeDiff(LocalDateTime start, LocalDateTime end) {
+        // System.out.println("Start: " + start);
+        // System.out.println("End: " + end);
+        // System.out.println("TimeDiff: " + Duration.between(start, end).toNanos());
+        return Duration.between(start, end).toNanos();
+    }
+    // Analysis Part Ends here
 
     public void setInitialSkipList(K key, V value) {
         // Node<K, V> node = null;
@@ -56,6 +85,10 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
 
     private int getMaxLevel() {
         return this.maxLevel;
+    }
+
+    private int getSkipListSize() {
+        return this.size;
     }
 
     private void setMaxLevel(int level) {
@@ -137,7 +170,9 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
     // }
 
     public void insertElement(K key, V value) {
+        LocalDateTime start;
         if ( size != 0 ) {
+            start = getCurrentTime();   // for analysis
             checkKeyValidity(key);
             Node<K, V> node = newFindNode(key);
             // System.out.println("node: " + node);
@@ -238,7 +273,12 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
                     }
                 }
             }
+
+            // Analysis Part
+            LocalDateTime end = getCurrentTime();
+            addToInsertMap(newNode.getKey().toString(), calculateTimeDiff(start, end));
         } else {
+            start = getCurrentTime();
             Node<K, V> newNode = new Node<K, V>(key, value, 0);
             Node<K, V> headNode = this.head;
             Node<K, V> tailNode = this.tail;
@@ -247,11 +287,16 @@ public class SkipList<K extends Comparable<K>, V> implements Iterable<K> {
             tailNode.setPrevious(newNode);
             newNode.setPrevious(headNode);
             
+            // Analysis Part
+            LocalDateTime end = getCurrentTime();
+            addToInsertMap(newNode.getKey().toString(), calculateTimeDiff(start, end));
         }
         
 
         size++;
         System.out.println("Inserted successfully!");
+
+        
     }
 
     public void removeElement(K key) {
